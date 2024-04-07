@@ -33,7 +33,6 @@ public class QuanLyNhanVienGUI extends JFrame {
 	private JButton btnNewButton_1;
 	private JTextField txtMaNhanVien;
 	private JTextField txtHoTen;
-	private JTextField textField_3;
 	private JTextField txtSoDienThoai;
 	private JButton btnLayMa;
 	private JRadioButton rdbtnNam;

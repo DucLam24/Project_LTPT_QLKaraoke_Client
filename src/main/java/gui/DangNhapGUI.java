@@ -1,21 +1,24 @@
 package gui;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import java.awt.Color;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.JTextField;
-import java.awt.Font;
 import java.awt.Dimension;
-import javax.swing.border.MatteBorder;
-import javax.swing.JPasswordField;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
+import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
+
 public class DangNhapGUI extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -23,10 +26,8 @@ public class DangNhapGUI extends JFrame {
 	private JTextField txtUser;
 	private JPasswordField txtPassword;
 	private JButton btnDangNhap;
-
-	/**
-	 * Launch the application.
-	 */
+	
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -96,12 +97,15 @@ public class DangNhapGUI extends JFrame {
 		
 		btnDangNhap = new JButton("Đăng nhập");
 		btnDangNhap.addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent e) {
-				PhongHatGUI phongHatGUI = new PhongHatGUI();
+				PhongHatGUI phongHatGUI = new PhongHatGUI(null,null);
 				phongHatGUI.setVisible(true);
 				dispose();
 			}
+				
 		});
+
 		btnDangNhap.setForeground(new Color(255, 255, 255));
 		btnDangNhap.setBackground(new Color(255, 162, 78));
 		btnDangNhap.setFont(new Font("Arial", Font.BOLD, 14));

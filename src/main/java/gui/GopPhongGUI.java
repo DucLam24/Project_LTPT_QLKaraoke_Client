@@ -75,7 +75,7 @@ public class GopPhongGUI extends JFrame {
 		scrollPane.setBounds(38, 81, 707, 237);
 		contentPane.add(scrollPane);
 		
-		String[] header = {"", "Phòng", "Loại phòng", "Giá tiền", "Giờ vào", "Ghi chú"};
+		//String[] header = {"", "Phòng", "Loại phòng", "Giá tiền", "Giờ vào", "Ghi chú"};
 		model=new DefaultTableModel(
 				new Object[][] {
 				},
@@ -92,20 +92,7 @@ public class GopPhongGUI extends JFrame {
 			};
 		table = new JTable() ;
 		table.setRowHeight(20);
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-			},
-			new String[] {
-				"", "Ph\u00F2ng", "Lo\u1EA1i ph\u00F2ng", "Gi\u00E1 ti\u1EC1n", "Gi\u1EDD v\u00E0o", "Ghi ch\u00FA"
-			}
-		) {
-			Class[] columnTypes = new Class[] {
-				Boolean.class, Object.class, Object.class, Object.class, Object.class, Object.class
-			};
-			public Class getColumnClass(int columnIndex) {
-				return columnTypes[columnIndex];
-			}
-		});
+		table.setModel(model);
 		table.getColumnModel().getColumn(0).setPreferredWidth(30);
 		table.setFont(new Font("Arial", Font.PLAIN, 14));
 		//add checkbox vào column

@@ -1,34 +1,40 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.MatteBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.JCheckBox;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import java.awt.FlowLayout;
-import java.awt.Dimension;
-import java.awt.BorderLayout;
-import javax.swing.SwingConstants;
-import javax.swing.border.TitledBorder;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.border.MatteBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
+
 import com.toedter.calendar.JDateChooser;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+
+import entity.NhanVien;
+import entity.Phong;
+
 
 
 public class PhongHatGUI extends JFrame {
@@ -43,8 +49,8 @@ public class PhongHatGUI extends JFrame {
 	private JButton btnDangSuDung;
 	private JScrollPane scrollPane;
 	private JPanel panel_1;
+	private JPanel jpPhong;
 	private JPanel jpPhongTrong;
-	private JPanel panel_3;
 	private JPanel jpPhongDatTruoc;
 	private JPanel jpPhongDangSuDung;
 	private JPanel jpPhongTamNgung;
@@ -119,7 +125,7 @@ public class PhongHatGUI extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					PhongHatGUI frame = new PhongHatGUI();
+					PhongHatGUI frame = new PhongHatGUI(null,null);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -131,7 +137,13 @@ public class PhongHatGUI extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public PhongHatGUI() {
+	public PhongHatGUI(NhanVien nv,List<Phong> listPhong) {
+		initComponents(nv,listPhong);
+	}
+
+	
+	private void initComponents(NhanVien nv,List<Phong> listPhong) {
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		contentPane = new JPanel();
@@ -204,27 +216,27 @@ public class PhongHatGUI extends JFrame {
 		scrollPane = new JScrollPane(panel_1 , ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		panel_1.setLayout(null);
 		
-		jpPhongTrong = new JPanel();
-		jpPhongTrong.setBounds(0, 0, 840, 100);
-		FlowLayout fl_jpPhongTrong = (FlowLayout) jpPhongTrong.getLayout();
-		fl_jpPhongTrong.setAlignment(FlowLayout.LEFT);
-		fl_jpPhongTrong.setVgap(0);
-		fl_jpPhongTrong.setHgap(10);
-		jpPhongTrong.setBorder(null);
-		jpPhongTrong.setBackground(new Color(255, 255, 255));
-		jpPhongTrong.setPreferredSize(new Dimension(840, 100));
-		panel_1.add(jpPhongTrong);
+		jpPhong = new JPanel();
+		jpPhong.setBounds(0, 0, 840, 100);
+		FlowLayout fl_jpPhong = (FlowLayout) jpPhong.getLayout();
+		fl_jpPhong.setAlignment(FlowLayout.LEFT);
+		fl_jpPhong.setVgap(0);
+		fl_jpPhong.setHgap(10);
+		jpPhong.setBorder(null);
+		jpPhong.setBackground(new Color(255, 255, 255));
+		jpPhong.setPreferredSize(new Dimension(840, 100));
+		panel_1.add(jpPhong);
 		
-		panel_3 = new JPanel();
-		panel_3.setBackground(new Color(216, 233, 168));
-		panel_3.setPreferredSize(new Dimension(265, 100));
-		jpPhongTrong.add(panel_3);
-		panel_3.setLayout(new BorderLayout(0, 0));
+		jpPhongTrong = new JPanel();
+		jpPhongTrong.setBackground(new Color(216, 233, 168));
+		jpPhongTrong.setPreferredSize(new Dimension(265, 100));
+		jpPhong.add(jpPhongTrong);
+		jpPhongTrong.setLayout(new BorderLayout(0, 0));
 		
 		panel_7 = new JPanel();
 		panel_7.setBackground(new Color(50, 240, 19));
 		panel_7.setPreferredSize(new Dimension(70, 10));
-		panel_3.add(panel_7, BorderLayout.WEST);
+		jpPhongTrong.add(panel_7, BorderLayout.WEST);
 		panel_7.setLayout(null);
 		
 		lblNewLabel_1 = new JLabel("P101");
@@ -246,7 +258,7 @@ public class PhongHatGUI extends JFrame {
 		
 		jp = new JPanel();
 		jp.setBackground(new Color(216, 233, 168));
-		panel_3.add(jp, BorderLayout.CENTER);
+		jpPhongTrong.add(jp, BorderLayout.CENTER);
 		jp.setLayout(null);
 		
 		lblNewLabel_3 = new JLabel("TRỐNG");
@@ -257,7 +269,7 @@ public class PhongHatGUI extends JFrame {
 		
 		jpPhongDatTruoc = new JPanel();
 		jpPhongDatTruoc.setPreferredSize(new Dimension(265, 100));
-		jpPhongTrong.add(jpPhongDatTruoc);
+		jpPhong.add(jpPhongDatTruoc);
 		jpPhongDatTruoc.setLayout(new BorderLayout(0, 0));
 		
 		panel_9 = new JPanel();
@@ -294,7 +306,7 @@ public class PhongHatGUI extends JFrame {
 		
 		jpPhongDangSuDung = new JPanel();
 		jpPhongDangSuDung.setPreferredSize(new Dimension(265, 100));
-		jpPhongTrong.add(jpPhongDangSuDung);
+		jpPhong.add(jpPhongDangSuDung);
 		jpPhongDangSuDung.setLayout(new BorderLayout(0, 0));
 		
 		panel_11 = new JPanel();
@@ -633,9 +645,7 @@ public class PhongHatGUI extends JFrame {
 		btnHuyDatPhong = new JButton("HỦY ĐẶT PHÒNG");
 		btnHuyDatPhong.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				MainGUI main = new MainGUI();
-				main.setVisible(true);
-				dispose();
+				
 			}
 		});
 		btnHuyDatPhong.setForeground(Color.WHITE);
@@ -645,9 +655,15 @@ public class PhongHatGUI extends JFrame {
 		panel.add(btnHuyDatPhong);
 		
 		
-		
-		
-		btnUser = new JButton("Nguyễn Văn A");
+		String ten=null;
+		if(nv!=null)
+			ten=nv.getHoTen();
+		btnUser = new JButton();
+		btnUser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		btnUser.setText(ten);
 		btnUser.setBorder(null);
 		btnUser.setBackground(new Color(33, 156, 144));
 		btnUser.setForeground(new Color(255, 255, 255));
@@ -670,5 +686,6 @@ public class PhongHatGUI extends JFrame {
 		btnLogout.setBorder(null);
 		btnLogout.setBounds(1456, 29, 70, 46);
 		contentPane.add(btnLogout);
+		
 	}
 }

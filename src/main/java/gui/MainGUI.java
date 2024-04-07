@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -83,7 +84,8 @@ public class MainGUI extends JFrame {
 	private JButton btnUser;
 	private JButton btnLogout;
 	private JPanel jpComboMain;
-
+	
+	
 	/**
 	 * Launch the application.
 	 */
@@ -242,11 +244,10 @@ public class MainGUI extends JFrame {
 		
 		
 		btnPhongHat = new JButton("Phòng hát");
-		btnPhongHat.addActionListener(new ActionListener() {
+		btnPhongHat.addActionListener(new ActionListener() {		
 			public void actionPerformed(ActionEvent e) {
-				PhongHatGUI phongHatGUI = new PhongHatGUI();
+				PhongHatGUI phongHatGUI=new PhongHatGUI(null, null);
 				phongHatGUI.setVisible(true);
-				dispose();
 			}
 		});
 		btnPhongHat.setBorder(null);
