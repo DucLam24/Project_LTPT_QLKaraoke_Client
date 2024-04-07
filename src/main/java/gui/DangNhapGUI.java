@@ -19,6 +19,17 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+import entity.NhanVien;
+import entity.Phong;
+import entity.Quyen;
+import reponse.ResponseLogin;
+import reponse.ResponseNhanVien;
+import reponse.ResponsePhong;
+import request.RequestLogin;
+import request.RequestNhanVien;
+import request.RequestPhong;
+import service.Service;
+
 public class DangNhapGUI extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -26,6 +37,15 @@ public class DangNhapGUI extends JFrame {
 	private JTextField txtUser;
 	private JPasswordField txtPassword;
 	private JButton btnDangNhap;
+	
+	private RequestLogin requestLogin=new RequestLogin(Service.getInstance().getSocket());
+	private ResponseLogin responseLogin=new ResponseLogin(Service.getInstance().getSocket());
+	
+	private RequestNhanVien requestNhanVien = new RequestNhanVien(Service.getInstance().getSocket());	
+	private ResponseNhanVien responseNhanVien = new ResponseNhanVien(Service.getInstance().getSocket());
+	
+	
+	
 	
 	
 	public static void main(String[] args) {
@@ -99,9 +119,36 @@ public class DangNhapGUI extends JFrame {
 		btnDangNhap.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				PhongHatGUI phongHatGUI = new PhongHatGUI(null,null);
-				phongHatGUI.setVisible(true);
-				dispose();
+				String user = txtUser.getText();
+				String password = txtPassword.getText();
+//				String user = "NV240002";
+//				String password ="12345678";
+				if(user.equals("")){
+					JOptionPane.showMessageDialog(null, "Vui lòng nhập tên đăng nhập");
+                }
+                else if(password.equals("")){
+                    JOptionPane.showMessageDialog(null, "Vui lòng nhập mật khẩu");
+                }
+                else{
+                    requestLogin.requestLogin(user, password);
+                    Quyen quyen = responseLogin.getResponseLogin();
+                    if(quyen !=null) {
+						if (quyen.toString().equals("Quản lý")) {
+							QuanLyGUI quanLyGUI = new QuanLyGUI();
+							quanLyGUI.setVisible(true);
+							dispose();
+						} else if (quyen.toString().equals("Nhân viên")) {
+							requestNhanVien.requestGetNhanVienById(user);
+							NhanVien nhanVien = responseNhanVien.getReponseGetNhanVienById();
+//							requestPhong.requestGetPhongByTinhTrang("Phòng trống");
+//							List<Phong> listPhong = responsePhong.getRespaonseGetPhongByTinhTrang();
+							MainGUI mainGUI = new MainGUI(nhanVien);
+							mainGUI.setVisible(true);
+							dispose();
+						}
+                    }
+                    
+				}
 			}
 				
 		});

@@ -51,7 +51,7 @@ public class QuanLyGUI extends JFrame {
 		JButton btnPhong = new JButton("PHÒNG HÁT");
 		btnPhong.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				PhongHatGUI phongHatGUI=new PhongHatGUI(null, null);
+				MainGUI phongHatGUI=new MainGUI(null);
 				phongHatGUI.setVisible(true);
 				dispose();
 			}
