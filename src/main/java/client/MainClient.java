@@ -1,10 +1,9 @@
 package client;
 
 import gui.DangNhapGUI;
-import service.InputDIS;
 import service.InputOIS;
+import service.MapMonAn;
 import service.OutputDOS;
-import service.OutputOOS;
 import service.Service;
 
 public class MainClient {
@@ -15,7 +14,7 @@ public class MainClient {
 		InputOIS.getInstance().start(Service.getInstance().getSocket());
 		DangNhapGUI dangNhapGUI = new DangNhapGUI();
 		dangNhapGUI.setVisible(true);
-		
+		MapMonAn.getInstance().start();
 //		OutputOOS.getInstance().start(Service.getInstance().getSocket());
 //		
 //		InputDIS.getInstance().start(Service.getInstance().getSocket());

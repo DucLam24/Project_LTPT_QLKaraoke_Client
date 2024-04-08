@@ -7,13 +7,15 @@ import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -36,10 +38,31 @@ import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 
+import entity.ChiTietDatCombo;
+import entity.ChiTietDatMon;
+import entity.Combo;
+import entity.HoaDon;
+import entity.KhachHang;
+import entity.MonAn;
 import entity.NhanVien;
+import entity.PhieuDatPhong;
 import entity.Phong;
+import reponse.ResponseChiTietDatCombo;
+import reponse.ResponseChiTietDatMon;
+import reponse.ResponseCombo;
+import reponse.ResponseHoaDon;
+import reponse.ResponseMonAn;
+import reponse.ResponsePhieuDatPhong;
 import reponse.ResponsePhong;
+import request.RequestChiTietDatCombo;
+import request.RequestChiTietDatMon;
+import request.RequestCombo;
+import request.RequestHoaDon;
+import request.RequestMonAn;
+import request.RequestPhieuDatPhong;
 import request.RequestPhong;
+import service.FormatDateTime;
+import service.MapMonAn;
 import service.Service;
 
 public class MainGUI extends JFrame {
@@ -54,33 +77,6 @@ public class MainGUI extends JFrame {
 	private JButton btnDangSuDung;
 	private JScrollPane scrollPane;
 	private JPanel jpPhong1;
-	private JPanel jpPhong;
-	private JPanel jpPhongTrong;
-	private JPanel jpPhongDatTruoc;
-	private JPanel jpPhongDangSuDung;
-	private JPanel jpPhongTamNgung;
-	private JPanel panel_7;
-	private JLabel lblNewLabel_1;
-	private JLabel lblNewLabel_2;
-	private JPanel jp;
-	private JLabel lblNewLabel_3;
-	private JLabel lblNewLabel_4;
-	private JPanel panel_9;
-	private JLabel lblNewLabel_5;
-	private JPanel panel_10;
-	private JLabel lblNewLabel_6;
-	private JLabel lblNewLabel_7;
-	private JLabel lblNewLabel_8;
-	private JPanel panel_11;
-	private JLabel lblNewLabel_9;
-	private JPanel panel_12;
-	private JLabel lblNewLabel_10;
-	private JLabel lblNewLabel_11;
-	private JLabel lblNewLabel_12;
-	private JPanel panel_13;
-	private JLabel lblNewLabel_13;
-	private JPanel panel_14;
-	private JLabel lblNewLabel_14;
 	private JPanel panel_15;
 	private JPanel jpTrangThaiPhong;
 	private JLabel lblTrangThaiPhong;
@@ -133,12 +129,39 @@ public class MainGUI extends JFrame {
 	private List<Phong> listPhongTrong = new ArrayList<>();
 	private List<Phong> listPhongDangSuDung = new ArrayList<>();
 	private List<Phong> listPhongTamNgung = new ArrayList<>();
-	private List<Phong> listPhongVIP = new ArrayList<>();
-	private List<Phong> listPhongCheck = new ArrayList<>();
 	private JLabel lblPhong;
 	private JDateChooser date;
 	private JButton btnThemMon;
-	private JButton btnCapNhat;
+	
+	private RequestPhieuDatPhong requestPhieuDatPhong = new RequestPhieuDatPhong(Service.getInstance().getSocket());
+	private ResponsePhieuDatPhong responsePhieuDatPhong= new ResponsePhieuDatPhong(Service.getInstance().getSocket());
+	private RequestMonAn requestMonAn = new RequestMonAn(Service.getInstance().getSocket());
+	private ResponseMonAn responseMonAn = new ResponseMonAn(Service.getInstance().getSocket());
+	private RequestCombo requestCombo = new RequestCombo(Service.getInstance().getSocket());
+	private ResponseCombo responseCombo = new ResponseCombo(Service.getInstance().getSocket());
+	private List<PhieuDatPhong> listPDP;
+	private PhieuDatPhong pdp;
+	
+	private List<Combo> listCombo=new ArrayList<>();
+	private List<MonAn> listSnack=new ArrayList<>();
+	private List<MonAn> listDrink=new ArrayList<>();
+	private List<MonAn> listFruit=new ArrayList<>();
+	private JPanel jpMonAn_1;
+	private JButton btnSearchMA;
+	private JButton btnTraiCay;
+	private JButton btnSnack;
+	private JButton btnDoUong;
+	private JButton btnComBo;
+	
+	private Map<Object, Integer> mapMonAn = MapMonAn.getInstance().getMapMonAn();
+	private RequestHoaDon requestHoaDon=new RequestHoaDon(Service.getInstance().getSocket());
+	private ResponseHoaDon responseHoaDon=new ResponseHoaDon(Service.getInstance().getSocket());
+	private List<HoaDon> listHD=new ArrayList<>();
+	private HoaDon hd;
+	private RequestChiTietDatCombo requestChiTietDatCombo=new RequestChiTietDatCombo(Service.getInstance().getSocket());
+	private ResponseChiTietDatCombo responseChiTietDatCombo=new ResponseChiTietDatCombo(Service.getInstance().getSocket());
+	private RequestChiTietDatMon requestChiTietDatMon=new RequestChiTietDatMon(Service.getInstance().getSocket());
+	private ResponseChiTietDatMon responseChiTietDatMon=new ResponseChiTietDatMon(Service.getInstance().getSocket());
 
 	/**
 	 * Launch the application.
@@ -172,6 +195,18 @@ public class MainGUI extends JFrame {
 
 		requestPhong.requestGetPhongByTinhTrang(btnTamNgung.getText());
 		listPhongTamNgung = responsePhong.getRespaonseGetPhongByTinhTrang();
+		
+		requestCombo.requestGetAllCombo();
+		listCombo=responseCombo.getReponseGetAllCombo();
+		
+		requestMonAn.requestFindMonAnByLoai("Snack");
+		listSnack=responseMonAn.getReponseFindMonAnByLoai();
+		
+		requestMonAn.requestFindMonAnByLoai("Đồ uống");
+		listDrink=responseMonAn.getReponseFindMonAnByLoai();
+		
+		requestMonAn.requestFindMonAnByLoai("Trái cây");
+		listFruit=responseMonAn.getReponseFindMonAnByLoai();
 		
 		
 	}
@@ -370,66 +405,7 @@ public class MainGUI extends JFrame {
 				}
 			}
 		});
-//			public void actionPerformed(ActionEvent e) {
-//				if (chckVIP.isSelected()) {
-//					List<Phong> listPhong = new ArrayList<>();
-//					List<Phong> listPhongVIP = new ArrayList<>();
-//					if (btnPhongTrong.isSelected()) {
-//						listPhong = listPhongTrong;
-//					}
-//					if (btnDatTruoc.isSelected()) {
-//						listPhong = listPhongDatTruoc;
-//					}
-//					if (btnDangSuDung.isSelected()) {
-//						listPhong = listPhongDangSuDung;
-//					}
-//					if (btnTamNgung.isSelected()) {
-//						listPhong = listPhongTamNgung;
-//					}
-//					for (Phong phong : listPhong) {
-//						if (phong.getLoaiPhong().toString().equals("Phòng VIP")) {
-//							listPhongVIP.add(phong);
-//						}
-//					}
-//					if (listPhongVIP.isEmpty()) {
-//						jpPhong1.removeAll();
-//						jpPhong1.repaint();
-//						jpPhong1.revalidate();
-//
-//					} else {
-//						paintComPhong(listPhongVIP);
-//						jpPhong1.repaint();
-//						jpPhong1.revalidate();
-//					}
-//
-//				} else {
-//					if (btnPhongTrong.isSelected()) {
-//						jpPhong1.removeAll();
-//						paintComPhong(listPhongTrong);
-//						jpPhong1.repaint();
-//						jpPhong1.revalidate();
-//					}
-//					if (btnDatTruoc.isSelected()) {
-//						jpPhong1.removeAll();
-//						paintComPhong(listPhongDatTruoc);
-//						jpPhong1.repaint();
-//						jpPhong1.revalidate();
-//					}
-//					if (btnDangSuDung.isSelected()) {
-//						jpPhong1.removeAll();
-//						paintComPhong(listPhongDangSuDung);
-//						jpPhong1.repaint();
-//						jpPhong1.revalidate();
-//					}
-//					if (btnTamNgung.isSelected()) {
-//						jpPhong1.removeAll();
-//						paintComPhong(listPhongTamNgung);
-//						jpPhong1.repaint();
-//						jpPhong1.revalidate();
-//					}
-//				}
-//			}
-//		});
+
 		chckVIP.setBackground(new Color(255, 255, 255));
 		chckVIP.setFont(new Font("Arial", Font.BOLD, 14));
 		chckVIP.setBounds(16, 103, 93, 21);
@@ -442,192 +418,7 @@ public class MainGUI extends JFrame {
 		jpPhong1.setLayout(null);
 		System.out.println(listPhong);
 
-//		paintComPhong(listPhong);
-//		ComPhong comPhong = new ComPhong(phong);
-//		comPhong.setBounds(10, 10, 265, 100);
-//		
-//		jpPhong1.add(comPhong);
 
-//		if (listPhong != null) {
-////			JPanel jpPhong = new JPanel();
-////			jpPhong.setBounds(0, 0, 840, 100);
-////			jpPhong.setLayout(new FlowLayout(FlowLayout.LEFT));
-//			int x=10;
-//			int y=10;
-//			for (Phong p : listPhong) {
-//				ComPhong comPhong = new ComPhong(p);
-//				comPhong.addMouseListener(new MouseAdapter() {
-//					@Override
-//					public void mouseClicked(MouseEvent e) {
-//						lblKQMaPhong.setText(p.getPhongID());
-//						lblKQTenPhong.setText(p.getTenPhong());
-//						lblKQLoaiPhong.setText(p.getLoaiPhong().toString());
-//						lblKetQuaSoNguoi.setText(String.valueOf(p.getSoNguoi()));
-//						lblKQGiaTien.setText(String.valueOf(p.getGiaTien()));
-//						if(p.getTinhTrang() == 0) {
-//                            lblKQGioVao.setText("");
-//						}
-//					}
-//				});
-//				comPhong.setBounds(x, y, 265, 100);
-//				jpPhong1.add(comPhong);
-//				x+=275;
-//				if (x > 800) {
-//					x = 10;
-//					y += 110;
-//				}
-//			}
-//			
-//		}
-
-//		jpPhong = new JPanel();
-//		jpPhong.setBounds(0, 0, 840, 100);
-//		FlowLayout fl_jpPhong = (FlowLayout) jpPhong.getLayout();
-//		fl_jpPhong.setAlignment(FlowLayout.LEFT);
-//		fl_jpPhong.setVgap(0);
-//		fl_jpPhong.setHgap(10);
-//		jpPhong.setBorder(null);
-//		jpPhong.setBackground(new Color(255, 255, 255));
-//		jpPhong.setPreferredSize(new Dimension(840, 100));
-//		jpPhong1.add(jpPhong);
-//		
-//		jpPhongTrong = new JPanel();
-//		jpPhongTrong.setBackground(new Color(216, 233, 168));
-//		jpPhongTrong.setPreferredSize(new Dimension(265, 100));
-//		jpPhong.add(jpPhongTrong);
-//		jpPhongTrong.setLayout(new BorderLayout(0, 0));
-//		
-//		panel_7 = new JPanel();
-//		panel_7.setBackground(new Color(50, 240, 19));
-//		panel_7.setPreferredSize(new Dimension(70, 10));
-//		jpPhongTrong.add(panel_7, BorderLayout.WEST);
-//		panel_7.setLayout(null);
-//		
-//		lblNewLabel_1 = new JLabel("P101");
-//		lblNewLabel_1.setForeground(new Color(255, 255, 255));
-//		lblNewLabel_1.setFont(new Font("Arial", Font.BOLD, 20));
-//		lblNewLabel_1.setBounds(10, 43, 50, 24);
-//		panel_7.add(lblNewLabel_1);
-//		
-//		lblNewLabel_2 = new JLabel("VIP");
-//		lblNewLabel_2.setForeground(Color.WHITE);
-//		lblNewLabel_2.setFont(new Font("Arial", Font.BOLD, 20));
-//		lblNewLabel_2.setBounds(20, 66, 33, 24);
-//		panel_7.add(lblNewLabel_2);
-//		
-//		lblNewLabel_4 = new JLabel("");
-//		lblNewLabel_4.setBounds(15, 0, 45, 47);
-//		panel_7.add(lblNewLabel_4);
-//		lblNewLabel_4.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/star.png"));
-//		
-//		jp = new JPanel();
-//		jp.setBackground(new Color(216, 233, 168));
-//		jpPhongTrong.add(jp, BorderLayout.CENTER);
-//		jp.setLayout(null);
-//		
-//		lblNewLabel_3 = new JLabel("TRỐNG");
-//		lblNewLabel_3.setForeground(new Color(0, 128, 0));
-//		lblNewLabel_3.setFont(new Font("Arial", Font.BOLD, 20));
-//		lblNewLabel_3.setBounds(41, 38, 86, 24);
-//		jp.add(lblNewLabel_3);
-//		
-//		jpPhongDatTruoc = new JPanel();
-//		jpPhongDatTruoc.setPreferredSize(new Dimension(265, 100));
-//		jpPhong.add(jpPhongDatTruoc);
-//		jpPhongDatTruoc.setLayout(new BorderLayout(0, 0));
-//		
-//		panel_9 = new JPanel();
-//		panel_9.setLayout(null);
-//		panel_9.setPreferredSize(new Dimension(70, 10));
-//		panel_9.setBackground(new Color(255, 199, 0));
-//		jpPhongDatTruoc.add(panel_9, BorderLayout.WEST);
-//		
-//		lblNewLabel_5 = new JLabel("P101");
-//		lblNewLabel_5.setForeground(Color.WHITE);
-//		lblNewLabel_5.setFont(new Font("Arial", Font.BOLD, 20));
-//		lblNewLabel_5.setBounds(10, 38, 50, 24);
-//		panel_9.add(lblNewLabel_5);
-//		
-//		panel_10 = new JPanel();
-//		panel_10.setBackground(new Color(255, 239, 183));
-//		jpPhongDatTruoc.add(panel_10, BorderLayout.CENTER);
-//		panel_10.setLayout(null);
-//		
-//		lblNewLabel_6 = new JLabel("30/03/2021  17:00:00");
-//		lblNewLabel_6.setFont(new Font("Arial", Font.BOLD, 14));
-//		lblNewLabel_6.setBounds(24, 10, 161, 13);
-//		panel_10.add(lblNewLabel_6);
-//		
-//		lblNewLabel_7 = new JLabel("Xuân Thanh");
-//		lblNewLabel_7.setFont(new Font("Arial", Font.BOLD, 25));
-//		lblNewLabel_7.setBounds(24, 33, 161, 25);
-//		panel_10.add(lblNewLabel_7);
-//		
-//		lblNewLabel_8 = new JLabel("00:00:00");
-//		lblNewLabel_8.setFont(new Font("Arial", Font.BOLD, 20));
-//		lblNewLabel_8.setBounds(59, 68, 87, 22);
-//		panel_10.add(lblNewLabel_8);
-//		
-//		jpPhongDangSuDung = new JPanel();
-//		jpPhongDangSuDung.setPreferredSize(new Dimension(265, 100));
-//		jpPhong.add(jpPhongDangSuDung);
-//		jpPhongDangSuDung.setLayout(new BorderLayout(0, 0));
-//		
-//		panel_11 = new JPanel();
-//		panel_11.setLayout(null);
-//		panel_11.setPreferredSize(new Dimension(70, 10));
-//		panel_11.setBackground(new Color(235, 100, 64));
-//		jpPhongDangSuDung.add(panel_11, BorderLayout.WEST);
-//		
-//		lblNewLabel_9 = new JLabel("P101");
-//		lblNewLabel_9.setForeground(Color.WHITE);
-//		lblNewLabel_9.setFont(new Font("Arial", Font.BOLD, 20));
-//		lblNewLabel_9.setBounds(10, 38, 50, 24);
-//		panel_11.add(lblNewLabel_9);
-//		
-//		panel_12 = new JPanel();
-//		panel_12.setBackground(new Color(245, 179, 161));
-//		jpPhongDangSuDung.add(panel_12, BorderLayout.CENTER);
-//		
-//		lblNewLabel_10 = new JLabel("30/03/2021  17:00:00");
-//		lblNewLabel_10.setFont(new Font("Arial", Font.BOLD, 14));
-//		panel_12.add(lblNewLabel_10);
-//		
-//		lblNewLabel_11 = new JLabel("Xuân Thanh");
-//		lblNewLabel_11.setFont(new Font("Arial", Font.BOLD, 25));
-//		panel_12.add(lblNewLabel_11);
-//		
-//		lblNewLabel_12 = new JLabel("00:00:00");
-//		lblNewLabel_12.setFont(new Font("Arial", Font.BOLD, 20));
-//		panel_12.add(lblNewLabel_12);
-//		
-//		jpPhongTamNgung = new JPanel();
-//		jpPhongTamNgung.setBounds(10, 117, 265, 100);
-//		jpPhongTamNgung.setPreferredSize(new Dimension(265, 100));
-//		jpPhong1.add(jpPhongTamNgung);
-//		jpPhongTamNgung.setLayout(new BorderLayout(0, 0));
-//		
-//		panel_13 = new JPanel();
-//		panel_13.setLayout(null);
-//		panel_13.setPreferredSize(new Dimension(70, 10));
-//		panel_13.setBackground(new Color(0, 0, 0));
-//		jpPhongTamNgung.add(panel_13, BorderLayout.WEST);
-//		
-//		lblNewLabel_13 = new JLabel("P101");
-//		lblNewLabel_13.setForeground(Color.WHITE);
-//		lblNewLabel_13.setFont(new Font("Arial", Font.BOLD, 20));
-//		lblNewLabel_13.setBounds(10, 38, 50, 24);
-//		panel_13.add(lblNewLabel_13);
-//		
-//		panel_14 = new JPanel();
-//		panel_14.setBackground(new Color(217, 217, 217));
-//		jpPhongTamNgung.add(panel_14, BorderLayout.CENTER);
-//		panel_14.setLayout(null);
-//		
-//		lblNewLabel_14 = new JLabel("TẠM NGƯNG");
-//		lblNewLabel_14.setBounds(10, 34, 163, 30);
-//		lblNewLabel_14.setFont(new Font("Arial", Font.BOLD, 25));
-//		panel_14.add(lblNewLabel_14);
 		scrollPane.setBorder(null);
 		scrollPane.setBounds(5, 140, 840, 610);
 		jpPhongHat.add(scrollPane);
@@ -652,9 +443,19 @@ public class MainGUI extends JFrame {
 		btnMonAn = new JButton("Món ăn");
 		btnMonAn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
+					System.out.println(entry.getKey() + " " + entry.getValue());
+				}
 				setColor(btnMonAn);
 				jpPhongHat.setVisible(false);
 				jpMonAn.setVisible(true);
+				
+				jpMonAn_1.removeAll();
+				List<Object> list=new ArrayList<>();
+				list.addAll(listCombo);
+				paintComMonAn(list);
+				jpMonAn_1.repaint();
+				jpMonAn_1.revalidate();
 			}
 		});
 		btnMonAn.setForeground(new Color(255, 255, 255));
@@ -972,68 +773,127 @@ public class MainGUI extends JFrame {
 		jpMonAn.add(textField);
 		textField.setColumns(10);
 
-		JButton btnNewButton = new JButton("Search");
-		btnNewButton.setForeground(new Color(255, 255, 255));
-		btnNewButton.setBackground(new Color(33, 156, 144));
-		btnNewButton.setFont(new Font("Arial", Font.PLAIN, 14));
-		btnNewButton.setBounds(683, 12, 85, 25);
-		jpMonAn.add(btnNewButton);
-
-		JButton btnNewButton_1 = new JButton("COMBO");
-		btnNewButton_1.setBackground(new Color(255, 162, 78));
-		btnNewButton_1.setForeground(new Color(255, 255, 255));
-		btnNewButton_1.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/combo.png"));
-		btnNewButton_1.setFont(new Font("Arial", Font.BOLD, 14));
-		btnNewButton_1.setBounds(47, 57, 160, 40);
-		jpMonAn.add(btnNewButton_1);
-
-		JButton btnNewButton_1_1 = new JButton("ĐỒ UỐNG");
-		btnNewButton_1_1.setBackground(new Color(33, 156, 144));
-		btnNewButton_1_1.setForeground(new Color(255, 255, 255));
-		btnNewButton_1_1.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/drink.png"));
-		btnNewButton_1_1.setFont(new Font("Arial", Font.BOLD, 14));
-		btnNewButton_1_1.setBounds(249, 57, 160, 40);
-		jpMonAn.add(btnNewButton_1_1);
-
-		JButton btnNewButton_1_1_1 = new JButton("SNACK");
-		btnNewButton_1_1_1.setBackground(new Color(33, 156, 144));
-		btnNewButton_1_1_1.setForeground(new Color(255, 255, 255));
-		btnNewButton_1_1_1.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/snack.png"));
-		btnNewButton_1_1_1.setFont(new Font("Arial", Font.BOLD, 14));
-		btnNewButton_1_1_1.setBounds(445, 57, 160, 40);
-		jpMonAn.add(btnNewButton_1_1_1);
-
-		JButton btnNewButton_1_1_2 = new JButton("TRÁI CÂY");
-		btnNewButton_1_1_2.setBackground(new Color(33, 156, 144));
-		btnNewButton_1_1_2.setForeground(new Color(255, 255, 255));
-		btnNewButton_1_1_2.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/fruit.png"));
-		btnNewButton_1_1_2.setFont(new Font("Arial", Font.BOLD, 14));
-		btnNewButton_1_1_2.setBounds(641, 57, 160, 40);
-		jpMonAn.add(btnNewButton_1_1_2);
+		btnSearchMA = new JButton("Search");
+		btnSearchMA.setForeground(new Color(255, 255, 255));
+		btnSearchMA.setBackground(new Color(33, 156, 144));
+		btnSearchMA.setFont(new Font("Arial", Font.PLAIN, 14));
+		btnSearchMA.setBounds(683, 12, 85, 25);
+		jpMonAn.add(btnSearchMA);
+// Xử lý món ăn --------------------------------------------------------------------------------------
 		
-		JPanel panel1 = new JPanel();
-		panel1.setBackground(new Color(255, 255, 255));
+		btnComBo = new JButton("COMBO");
+		btnComBo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setColorMonAn(btnComBo);
+				jpMonAn_1.removeAll();
+				List<Object> list = new ArrayList<>();
+				list.addAll(listCombo);
+				paintComMonAn(list);
+				jpMonAn_1.repaint();
+				jpMonAn_1.revalidate();
+			}
+		});
+		btnComBo.setBackground(new Color(255, 162, 78));
+		btnComBo.setForeground(new Color(255, 255, 255));
+		btnComBo.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/combo.png"));
+		btnComBo.setFont(new Font("Arial", Font.BOLD, 14));
+		btnComBo.setBounds(47, 57, 160, 40);
+		jpMonAn.add(btnComBo);
 
-		scrollPane1 = new JScrollPane(panel1, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+		btnDoUong = new JButton("ĐỒ UỐNG");
+		btnDoUong.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setColorMonAn(btnDoUong);
+				jpMonAn_1.removeAll();
+				List<Object> list = new ArrayList<>();
+				list.addAll(listDrink);
+				paintComMonAn(list);
+				jpMonAn_1.repaint();
+				jpMonAn_1.revalidate();
+			}
+		});
+		btnDoUong.setBackground(new Color(33, 156, 144));
+		btnDoUong.setForeground(new Color(255, 255, 255));
+		btnDoUong.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/drink.png"));
+		btnDoUong.setFont(new Font("Arial", Font.BOLD, 14));
+		btnDoUong.setBounds(249, 57, 160, 40);
+		jpMonAn.add(btnDoUong);
+
+		btnSnack = new JButton("SNACK");
+		btnSnack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setColorMonAn(btnSnack);
+				jpMonAn_1.removeAll();
+				List<Object> list = new ArrayList<>();
+				list.addAll(listSnack);
+				paintComMonAn(list);
+				jpMonAn_1.repaint();
+				jpMonAn_1.revalidate();
+			}
+		});
+		btnSnack.setBackground(new Color(33, 156, 144));
+		btnSnack.setForeground(new Color(255, 255, 255));
+		btnSnack.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/snack.png"));
+		btnSnack.setFont(new Font("Arial", Font.BOLD, 14));
+		btnSnack.setBounds(445, 57, 160, 40);
+		jpMonAn.add(btnSnack);
+
+		btnTraiCay = new JButton("TRÁI CÂY");
+		btnTraiCay.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setColorMonAn(btnTraiCay);
+				jpMonAn_1.removeAll();
+				List<Object> list = new ArrayList<>();
+				list.addAll(listFruit);
+				paintComMonAn(list);
+				jpMonAn_1.repaint();
+				jpMonAn_1.revalidate();
+			}
+		});
+		btnTraiCay.setBackground(new Color(33, 156, 144));
+		btnTraiCay.setForeground(new Color(255, 255, 255));
+		btnTraiCay.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/fruit.png"));
+		btnTraiCay.setFont(new Font("Arial", Font.BOLD, 14));
+		btnTraiCay.setBounds(641, 57, 160, 40);
+		jpMonAn.add(btnTraiCay);
+		
+		jpMonAn_1 = new JPanel();
+		jpMonAn_1.setBackground(new Color(255, 255, 255));
+
+		scrollPane1 = new JScrollPane(jpMonAn_1, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane1.setBounds(10, 129, 830, 538);
 		scrollPane1.setBorder(null);
 		jpMonAn.add(scrollPane1);
-		panel1.setLayout(null);
+		jpMonAn_1.setLayout(null);
 		
 		btnThemMon = new JButton("Thêm món");
+		btnThemMon.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				model.setRowCount(0);
+				System.out.println("Thêm món");
+				for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
+					Object key = entry.getKey();
+					Integer value = entry.getValue();
+					System.out.println(key + " " + value);
+					if(key instanceof Combo) {
+						Combo combo = (Combo) key;
+						model.addRow(new Object[] { combo.getComboID(), combo.getTenCombo(), value, combo.getGiaTien(), combo.getGiaTien()*value });
+					}
+					if (key instanceof MonAn) {
+						MonAn monAn = (MonAn) key;
+						model.addRow(new Object[] { monAn.getMonAnID(), monAn.getTenMonAn(), value+" "+ monAn.getDonViTinh() ,monAn.getDonGia(),
+								monAn.getDonGia() * value });
+					}
+				}
+				
+			}
+		});
 		btnThemMon.setForeground(Color.WHITE);
 		btnThemMon.setFont(new Font("Arial", Font.BOLD, 14));
 		btnThemMon.setBackground(new Color(33, 156, 144));
 		btnThemMon.setBounds(210, 677, 170, 30);
 		jpMonAn.add(btnThemMon);
-		
-		btnCapNhat = new JButton("Cập nhật");
-		btnCapNhat.setForeground(Color.WHITE);
-		btnCapNhat.setFont(new Font("Arial", Font.BOLD, 14));
-		btnCapNhat.setBackground(new Color(33, 156, 144));
-		btnCapNhat.setBounds(390, 677, 170, 30);
-		jpMonAn.add(btnCapNhat);
 		
 		jpPhongHat.setVisible(true);
 		jpMonAn.setVisible(false);
@@ -1042,6 +902,20 @@ public class MainGUI extends JFrame {
 		setColorLoaiPhong(btnPhongTrong);
 		paintComPhong(listPhongTrong);
 
+	}
+
+	protected void setColorMonAn(JButton btnComBo2) {
+		setDefaultColorMonAn();
+		btnComBo2.setBackground(new Color(255, 162, 78));
+	}
+
+	private void setDefaultColorMonAn() {
+		// TODO Auto-generated method stub
+		btnComBo.setBackground(new Color(33, 156, 144));
+		btnDoUong.setBackground(new Color(33, 156, 144));
+		btnSnack.setBackground(new Color(33, 156, 144));
+		btnTraiCay.setBackground(new Color(33, 156, 144));
+		
 	}
 
 	protected void setSelectedButton(JButton btn) {
@@ -1109,6 +983,27 @@ public class MainGUI extends JFrame {
 			for (Phong p : listPhong) {
 				
 				ComPhong comPhong = new ComPhong(p);
+				if(p.getTinhTrang()==1) {
+					requestPhieuDatPhong.requestGetPDPByPhongIDAndTinhTrang(p.getPhongID(), 0);
+					listPDP=responsePhieuDatPhong.getResponseGetPDPByPhongIDAndTinhTrang();
+					if(listPDP.size()>0) {
+						pdp = listPDP.get(0);
+						comPhong.setPhongDatTruoc(pdp);
+					}
+				} else if (p.getTinhTrang() == 2) {
+					System.out.println("Phong dang su dung");
+					requestHoaDon.requestGetHoaDonByPhongIDAndTinhTrang(p.getPhongID(), false);
+					listHD = responseHoaDon.getReponseGetHoaDonByPhongIDAndTinhTrang();
+					
+					System.out.println(listHD.size());
+					if (listHD.size() > 0) {
+						hd = listHD.get(0);
+						comPhong.setPhongDangSuDung(hd);
+						
+					}
+				}
+				
+				
 				comPhong.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
@@ -1131,12 +1026,39 @@ public class MainGUI extends JFrame {
 //							lblKQGioVao.setText(p.getGioVao().toString());
 							jpTrangThaiPhong.setBackground(new Color(255, 199, 0));
 							lblTrangThaiPhong.setText("Phòng đặt trước");
-							
+							lblKQGioVao.setText(pdp.getGioVao().toString());
+							setKhachHang(pdp.getKhachHang());
+							lblTongGio.setText(FormatDateTime.tinhKhoanThoiGian(pdp.getGioVao(), LocalDateTime.now()));
+							resetMonAn();
+//							System.out.println(listPDP);
 						}
 						if (p.getTinhTrang() == 2) {
 //							lblKQGioVao.setText(p.getGioVao().toString());
 							jpTrangThaiPhong.setBackground(new Color(235, 100, 64));
 							lblTrangThaiPhong.setText("Phòng đang sử dụng");
+							setKhachHang(hd.getKhachHang());
+							setMonAn(mapMonAn);
+							
+							
+							requestChiTietDatCombo.requestGetByPhieuDatMonID(hd.getPhieuDatMon().getPhieuDatMonID());
+							List<ChiTietDatCombo> listCTDC = responseChiTietDatCombo.getReponseGetByPhieuDatMonID();
+							requestChiTietDatMon.requestGetByPhieuDatMonID(hd.getPhieuDatMon().getPhieuDatMonID());
+							List<ChiTietDatMon> listCTDM = responseChiTietDatMon.getReponseGetByPhieuDatMonID();
+							
+							//Map<Object, Integer> map = new LinkedHashMap<>();
+							for (ChiTietDatCombo ctdc : listCTDC) {
+								mapMonAn.put(ctdc.getCombo(), ctdc.getSoLuong());
+							}
+							for (ChiTietDatMon ctdm : listCTDM) {
+								mapMonAn.put(ctdm.getMonAn(), ctdm.getSoLuong());
+							}
+							System.out.println("Su kien click");
+							for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
+								System.out.println(entry.getKey() + " " + entry.getValue());
+							}
+							setMonAn(mapMonAn);
+							
+							
 						}
 						if (p.getTinhTrang() == 3) {
 							lblKQGioVao.setText("");
@@ -1159,7 +1081,47 @@ public class MainGUI extends JFrame {
 
 		}
 	}
+	public void paintComMonAn(List<Object> listObject) {
+		if (listObject != null) {
+			int x = 10;
+			int y = 10;
+			for (Object o : listObject) {
+				ComMonAn comMonAn = new ComMonAn(o);
+				comMonAn.setBounds(x, y, 265, 100);
+				jpMonAn_1.add(comMonAn);
+				x += 275;
+				if (x > 800) {
+					x = 10;
+					y += 110;
+				}
+//				System.out.println("paintComMonAn");
+//				for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
+////					System.out.println(entry.getKey());
+////					System.out.println(o);
+////					System.out.println(entry.getKey().equals(o));
+//					if (entry.getKey().equals(o)) {
+//						comMonAn.setSoLuong(entry.getValue());
+//					}
+//					
+//					System.out.println(entry.getKey() + " " + entry.getValue());
+//				}
+//				List<Object> list = Arrays.asList(o);
+				if (mapMonAn.containsKey(o)) {
+					comMonAn.setSoLuong(mapMonAn.get(o));
+				}
+			}
 
+		}
+	}
+
+	public void capNhatMapCong(Object o) {
+		for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
+			if (entry.getKey().equals(o)) {
+				entry.setValue(entry.getValue() + 1);
+			}
+		}
+	
+	}
 	public void resetKhachHang() {
 		txtHoTen.setText("");
 		txtSDT.setText("");
@@ -1170,6 +1132,51 @@ public class MainGUI extends JFrame {
 	}
 	public void resetMonAn() {
 		model.setRowCount(0);
+	}
+	public void resetPhong() {
+		lblKetQuaSoNguoi.setText("");
+		lblKQGiaTien.setText("");
+		lblKQGioVao.setText("");
+		lblKQLoaiPhong.setText("");
+		lblKQMaPhong.setText("");
+		lblKQTenPhong.setText("");
+		
+	}
+	public void reset() {
+		resetKhachHang();
+		resetPhong();
+		resetMonAn();
+	}
+	public void setKhachHang(KhachHang kh) {
+		txtHoTen.setText(kh.getHoTen());
+		txtSDT.setText(kh.getSoDienThoai());
+		txtEmail.setText(kh.getEmail());
+		if (kh.isGioiTinh()) {
+			rdbtnNam.setSelected(true);
+		} else {
+			rdbtnNu.setSelected(true);
+		}
+		Date date1 = java.sql.Date.valueOf(kh.getNgaySinh());
+		date.setDate(date1);
+		
+	}
+
+	public void setMonAn(Map<Object, Integer> map) {
+		for (Map.Entry<Object, Integer> entry : map.entrySet()) {
+			Object key = entry.getKey();
+			Integer value = entry.getValue();
+			if (key instanceof Combo) {
+				Combo combo = (Combo) key;
+				model.addRow(new Object[] { combo.getComboID(), combo.getTenCombo(), value, combo.getGiaTien(),
+						combo.getGiaTien() * value });
+			}
+			if (key instanceof MonAn) {
+				MonAn monAn = (MonAn) key;
+				model.addRow(new Object[] { monAn.getMonAnID(), monAn.getTenMonAn(), value + " " + monAn.getDonViTinh(),
+						monAn.getDonGia(), monAn.getDonGia() * value });
+			}
+		}
+		
 	}
 
 }

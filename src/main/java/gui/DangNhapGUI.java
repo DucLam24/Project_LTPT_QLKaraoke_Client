@@ -119,10 +119,10 @@ public class DangNhapGUI extends JFrame {
 		btnDangNhap.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				String user = txtUser.getText();
-				String password = txtPassword.getText();
-//				String user = "NV240002";
-//				String password ="12345678";
+//				String user = txtUser.getText();
+//				String password = txtPassword.getText();
+				String user = "NV240001";
+				String password ="12345678";
 				if(user.equals("")){
 					JOptionPane.showMessageDialog(null, "Vui lòng nhập tên đăng nhập");
                 }

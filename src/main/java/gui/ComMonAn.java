@@ -1,60 +1,204 @@
 package gui;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
 import java.awt.Color;
 import java.awt.Font;
-import javax.swing.SwingConstants;
-import javax.swing.JButton;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
+import service.MapMonAn;
 
 public class ComMonAn extends JPanel {
+	private JPanel jp;
+	private JButton btnTru;
+	private  JLabel lblSoLuong;
+	private JButton btnCong;
+	private Map<Object, Integer> mapMonAn = MapMonAn.getInstance().getMapMonAn();
+	private int soLuong;
 
-	private static final long serialVersionUID = 1L;
-
+	
+	
+	
 	/**
 	 * Create the panel.
 	 */
-	public ComMonAn() {
-		setBackground(new Color(142, 255, 255));
+	public ComMonAn(Object object) {
+		
+		setBackground(new Color(255, 255, 255));
 		setLayout(null);
 		
-		JLabel lblNewLabel = new JLabel("");
-		lblNewLabel.setIcon(new ImageIcon(ComMonAn.class.getResource("/img/combo_1.png")));
-		lblNewLabel.setBounds(0, 0, 100, 100);
-		add(lblNewLabel);
+		jp = new JPanel();
+		jp.setBackground(new Color(255, 215, 174));
+		jp.setBounds(0, 0, 267, 100);
+		add(jp);
+		jp.setLayout(null);
 		
-		JLabel lblNewLabel_1 = new JLabel("COMBO 1");
-		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_1.setFont(new Font("Arial", Font.BOLD, 16));
-		lblNewLabel_1.setBounds(110, 10, 130, 19);
-		add(lblNewLabel_1);
+		JLabel lblHinhAnh = new JLabel("");
+		lblHinhAnh.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/combo_1.png"));
+		lblHinhAnh.setBounds(0, 0, 100, 100);
+		jp.add(lblHinhAnh);
 		
-		JLabel lblNewLabel_2 = new JLabel("99.000");
-		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_2.setForeground(new Color(255, 0, 0));
-		lblNewLabel_2.setFont(new Font("Arial", Font.BOLD, 20));
-		lblNewLabel_2.setBounds(110, 39, 130, 19);
-		add(lblNewLabel_2);
+		JLabel lblTenMonAn = new JLabel("COMBO 1");
+		lblTenMonAn.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTenMonAn.setFont(new Font("Arial", Font.BOLD, 16));
+		lblTenMonAn.setBounds(110, 10, 130, 19);
+		jp.add(lblTenMonAn);
 		
-		JButton btnNewButton = new JButton("-");
-		btnNewButton.setBackground(new Color(255, 255, 255));
-		btnNewButton.setBounds(110, 69, 37, 21);
-		add(btnNewButton);
+		JLabel lblGia = new JLabel("99.000");
+		lblGia.setHorizontalAlignment(SwingConstants.CENTER);
+		lblGia.setForeground(Color.RED);
+		lblGia.setFont(new Font("Arial", Font.BOLD, 20));
+		lblGia.setBounds(110, 36, 130, 19);
+		jp.add(lblGia);
 		
-		JButton btnNewButton_1 = new JButton("+");
-		btnNewButton_1.setBackground(new Color(255, 255, 255));
-		btnNewButton_1.setMargin(new Insets(2, 10, 2, 10));
-		btnNewButton_1.setBounds(203, 69, 37, 21);
-		add(btnNewButton_1);
+		System.out.println(soLuong);
 		
-		JLabel lblNewLabel_3 = new JLabel("0");
-		lblNewLabel_3.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_3.setFont(new Font("Arial", Font.BOLD, 14));
-		lblNewLabel_3.setBounds(150, 73, 45, 13);
-		add(lblNewLabel_3);
+		btnTru = new JButton("-");
+		btnTru.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {				
+				if (soLuong > 0) {
+					soLuong--;
+//					lblSoLuong.setText(String.valueOf(soLuong));
+					setSoLuong(soLuong);
+					btnCong.setEnabled(true);
+					updateMap(object);
+//					System.out.println(soLuong);
+				} else {
+					btnTru.setEnabled(false);
+				}
+			}
+
+			
+		});
+		btnTru.setMargin(new Insets(2, 10, 2, 10));
+		btnTru.setBackground(Color.WHITE);
+		btnTru.setBounds(107, 65, 37, 21);
+		jp.add(btnTru);
+		
+		btnCong = new JButton("+");
+		btnCong.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int soLuongTon = getSoLuongTon(object);
+				if (soLuong < soLuongTon) {
+					soLuong++;
+//					lblSoLuong.setText(String.valueOf(soLuong));
+					setSoLuong(soLuong);
+					btnTru.setEnabled(true);
+					updateMap(object);
+//					System.out.println(soLuong);
+				} else {
+					btnCong.setEnabled(false);
+				}
+			}
+		});
+		btnCong.setMargin(new Insets(2, 10, 2, 10));
+		btnCong.setBackground(Color.WHITE);
+		btnCong.setBounds(203, 65, 37, 21);
+		jp.add(btnCong);
+		
+		lblSoLuong = new JLabel("0");
+		lblSoLuong.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSoLuong.setFont(new Font("Arial", Font.BOLD, 14));
+		lblSoLuong.setBounds(148, 68, 45, 13);
+		jp.add(lblSoLuong);
+		
+		if(mapMonAn.isEmpty()) {
+			soLuong = 0;
+		} else {
+			for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
+				if (entry.getKey().equals(object)) {
+					soLuong = entry.getValue();
+					break;
+				} else {
+					soLuong = 0;
+				}
+			}
+		}
+		
+		if (object instanceof entity.Combo) {
+			entity.Combo combo = (entity.Combo) object;
+			lblTenMonAn.setText(combo.getTenCombo());
+			lblGia.setText(String.valueOf(combo.getGiaTien()));
+			lblHinhAnh.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/combo_1.png"));
+			jp.setBackground(new Color(200, 255, 255));
+			//setBackground(new Color(255, 255, 142));
+		}
+		if (object instanceof entity.MonAn) {
+			entity.MonAn monAn = (entity.MonAn) object;
+			lblTenMonAn.setText(monAn.getTenMonAn());
+			lblGia.setText(String.valueOf(monAn.getDonGia()));
+			if(monAn.getLoaiMonAn().toString().equals("Đồ uống")) {
+				lblHinhAnh.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/drink_1.png"));
+				jp.setBackground(new Color(200, 255, 255));
+				//setBackground(new Color(255, 255, 142));
+			}
+			if (monAn.getLoaiMonAn().toString().equals("Snack")) {
+				lblHinhAnh.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/snack_1.png"));
+				jp.setBackground(new Color(255, 215, 174));
+				//setBackground(new Color(225, 254, 193));
+			}
+			if (monAn.getLoaiMonAn().toString().equals("Trái cây")) {
+				lblHinhAnh.setIcon(new ImageIcon(System.getProperty("user.dir") + "/src/main/java/img/fruit_1.png"));
+				jp.setBackground(new Color(225, 224, 193));
+				//setBackground(new Color(225, 224, 193));
+			}
+			
+		}
 
 	}
+
+	public int getSoLuongTon(Object object) {
+		if (object instanceof entity.Combo) {
+			entity.Combo combo = (entity.Combo) object;
+			return combo.getSoLuongTon();
+		}
+		if (object instanceof entity.MonAn) {
+			entity.MonAn monAn = (entity.MonAn) object;
+			return monAn.getSoLuongTon();
+		}
+		return 0;
+		
+	}
+
+//	public static int getSoLuong() {
+//		return soLuong;
+//	}
+
+
+	public void updateMap(Object object) {
+//		List<Object> list=Arrays.asList(object);
+		if (mapMonAn.containsKey(object)) {
+			if (soLuong == 0) {
+				mapMonAn.remove(object);
+			} else {
+				mapMonAn.replace(object, soLuong);
+			}
+		} else {
+			mapMonAn.put(object, soLuong);
+			System.out.println("Sai o day");
+			
+			
+	
+		}
+	}
+	
+	
+	public void setSoLuong(int soLuong) {
+		lblSoLuong.setText(String.valueOf(soLuong));
+		
+	}
+
+
+	
 
 }
