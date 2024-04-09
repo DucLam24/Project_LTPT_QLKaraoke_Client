@@ -21,4 +21,9 @@ public class FormatDateTime {
 		int min = (int) (minute % 60);
 		return hour +":" + min;
 	}
+	public static String formatLayGio(LocalDateTime localDateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+        return localDateTime.format(formatter);
+		
+	}
 }

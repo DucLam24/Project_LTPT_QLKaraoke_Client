@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.List;
 
 import entity.ChiTietDatMon;
+import service.InputDIS;
 import service.InputOIS;
 
 public class ResponseChiTietDatMon {
@@ -16,6 +17,7 @@ public class ResponseChiTietDatMon {
 	public ResponseChiTietDatMon(Socket socket) {
 		this.socket = socket;
 		ois = InputOIS.getInstance().getOis();
+		dis = InputDIS.getInstance().getDis();
 
 	}
 	
@@ -27,5 +29,23 @@ public class ResponseChiTietDatMon {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public boolean getReponseUpdateSoLuong() {
+		try {
+			return dis.readBoolean();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public boolean getReponseAddMonAn() {
+		try {
+			return dis.readBoolean();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

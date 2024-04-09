@@ -11,7 +11,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -132,36 +132,42 @@ public class MainGUI extends JFrame {
 	private JLabel lblPhong;
 	private JDateChooser date;
 	private JButton btnThemMon;
-	
+
 	private RequestPhieuDatPhong requestPhieuDatPhong = new RequestPhieuDatPhong(Service.getInstance().getSocket());
-	private ResponsePhieuDatPhong responsePhieuDatPhong= new ResponsePhieuDatPhong(Service.getInstance().getSocket());
+	private ResponsePhieuDatPhong responsePhieuDatPhong = new ResponsePhieuDatPhong(Service.getInstance().getSocket());
 	private RequestMonAn requestMonAn = new RequestMonAn(Service.getInstance().getSocket());
 	private ResponseMonAn responseMonAn = new ResponseMonAn(Service.getInstance().getSocket());
 	private RequestCombo requestCombo = new RequestCombo(Service.getInstance().getSocket());
 	private ResponseCombo responseCombo = new ResponseCombo(Service.getInstance().getSocket());
 	private List<PhieuDatPhong> listPDP;
 	private PhieuDatPhong pdp;
-	
-	private List<Combo> listCombo=new ArrayList<>();
-	private List<MonAn> listSnack=new ArrayList<>();
-	private List<MonAn> listDrink=new ArrayList<>();
-	private List<MonAn> listFruit=new ArrayList<>();
+
+	private List<Combo> listCombo = new ArrayList<>();
+	private List<MonAn> listSnack = new ArrayList<>();
+	private List<MonAn> listDrink = new ArrayList<>();
+	private List<MonAn> listFruit = new ArrayList<>();
 	private JPanel jpMonAn_1;
 	private JButton btnSearchMA;
 	private JButton btnTraiCay;
 	private JButton btnSnack;
 	private JButton btnDoUong;
 	private JButton btnComBo;
-	
+
 	private Map<Object, Integer> mapMonAn = MapMonAn.getInstance().getMapMonAn();
-	private RequestHoaDon requestHoaDon=new RequestHoaDon(Service.getInstance().getSocket());
-	private ResponseHoaDon responseHoaDon=new ResponseHoaDon(Service.getInstance().getSocket());
-	private List<HoaDon> listHD=new ArrayList<>();
+	private RequestHoaDon requestHoaDon = new RequestHoaDon(Service.getInstance().getSocket());
+	private ResponseHoaDon responseHoaDon = new ResponseHoaDon(Service.getInstance().getSocket());
+
+	private RequestChiTietDatCombo requestChiTietDatCombo = new RequestChiTietDatCombo(
+			Service.getInstance().getSocket());
+	private ResponseChiTietDatCombo responseChiTietDatCombo = new ResponseChiTietDatCombo(
+			Service.getInstance().getSocket());
+	private RequestChiTietDatMon requestChiTietDatMon = new RequestChiTietDatMon(Service.getInstance().getSocket());
+	private ResponseChiTietDatMon responseChiTietDatMon = new ResponseChiTietDatMon(Service.getInstance().getSocket());
 	private HoaDon hd;
-	private RequestChiTietDatCombo requestChiTietDatCombo=new RequestChiTietDatCombo(Service.getInstance().getSocket());
-	private ResponseChiTietDatCombo responseChiTietDatCombo=new ResponseChiTietDatCombo(Service.getInstance().getSocket());
-	private RequestChiTietDatMon requestChiTietDatMon=new RequestChiTietDatMon(Service.getInstance().getSocket());
-	private ResponseChiTietDatMon responseChiTietDatMon=new ResponseChiTietDatMon(Service.getInstance().getSocket());
+	private PhieuDatPhong pdp1;
+	private HoaDon hd1;
+
+	private Map<Object, Integer> mapMonAnFirst = new LinkedHashMap<>();
 
 	/**
 	 * Launch the application.
@@ -195,20 +201,19 @@ public class MainGUI extends JFrame {
 
 		requestPhong.requestGetPhongByTinhTrang(btnTamNgung.getText());
 		listPhongTamNgung = responsePhong.getRespaonseGetPhongByTinhTrang();
-		
+
 		requestCombo.requestGetAllCombo();
-		listCombo=responseCombo.getReponseGetAllCombo();
-		
+		listCombo = responseCombo.getReponseGetAllCombo();
+
 		requestMonAn.requestFindMonAnByLoai("Snack");
-		listSnack=responseMonAn.getReponseFindMonAnByLoai();
-		
+		listSnack = responseMonAn.getReponseFindMonAnByLoai();
+
 		requestMonAn.requestFindMonAnByLoai("Đồ uống");
-		listDrink=responseMonAn.getReponseFindMonAnByLoai();
-		
+		listDrink = responseMonAn.getReponseFindMonAnByLoai();
+
 		requestMonAn.requestFindMonAnByLoai("Trái cây");
-		listFruit=responseMonAn.getReponseFindMonAnByLoai();
-		
-		
+		listFruit = responseMonAn.getReponseFindMonAnByLoai();
+
 	}
 
 	private void initComponents(NhanVien nv, List<Phong> listPhong) {
@@ -247,7 +252,7 @@ public class MainGUI extends JFrame {
 		jpPhongHat.add(btnSearch);
 
 		btnPhongTrong = new JButton("Phòng trống");
-		//btnPhongTrong.setSelected(true);
+		// btnPhongTrong.setSelected(true);
 		btnPhongTrong.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setSelectedButton(btnPhongTrong);
@@ -261,6 +266,12 @@ public class MainGUI extends JFrame {
 					jpPhong1.repaint();
 					jpPhong1.revalidate();
 				}
+				btnGopPhong.setEnabled(false);
+				btnDoiPhong.setEnabled(false);
+				btnHuyDatPhong.setEnabled(false);
+				btnNhanPhong.setEnabled(true);
+				btnDatPhong.setEnabled(true);
+				btnTraPhong.setEnabled(false);
 
 			}
 		});
@@ -287,6 +298,12 @@ public class MainGUI extends JFrame {
 					jpPhong1.repaint();
 					jpPhong1.revalidate();
 				}
+				btnGopPhong.setEnabled(false);
+				btnDoiPhong.setEnabled(false);
+				btnHuyDatPhong.setEnabled(true);
+				btnNhanPhong.setEnabled(true);
+				btnDatPhong.setEnabled(false);
+				btnTraPhong.setEnabled(false);
 			}
 		});
 		btnDatTruoc.setForeground(Color.WHITE);
@@ -306,10 +323,16 @@ public class MainGUI extends JFrame {
 					paintComPhong(listPhongDangSuDung);
 					jpPhong1.repaint();
 					jpPhong1.revalidate();
-				}else {
+				} else {
 					jpPhong1.repaint();
 					jpPhong1.revalidate();
 				}
+				btnGopPhong.setEnabled(true);
+				btnDoiPhong.setEnabled(true);
+				btnHuyDatPhong.setEnabled(false);
+				btnNhanPhong.setEnabled(false);
+				btnDatPhong.setEnabled(false);
+				btnTraPhong.setEnabled(true);
 			}
 		});
 		btnDangSuDung.setForeground(Color.WHITE);
@@ -329,7 +352,13 @@ public class MainGUI extends JFrame {
 					paintComPhong(listPhongTamNgung);
 					jpPhong1.repaint();
 					jpPhong1.revalidate();
-				} 
+				}
+				btnGopPhong.setEnabled(false);
+				btnDoiPhong.setEnabled(false);
+				btnHuyDatPhong.setEnabled(false);
+				btnNhanPhong.setEnabled(false);
+				btnDatPhong.setEnabled(false);
+				btnTraPhong.setEnabled(false);
 			}
 		});
 		btnTamNgung.setForeground(Color.WHITE);
@@ -338,8 +367,8 @@ public class MainGUI extends JFrame {
 		btnTamNgung.setBackground(new Color(33, 156, 144));
 		btnTamNgung.setBounds(661, 58, 135, 30);
 		jpPhongHat.add(btnTamNgung);
-		
-        btnPhongTrong.setSelected(true);
+
+		btnPhongTrong.setSelected(true);
 
 		chckVIP = new JCheckBox("VIP");
 		chckVIP.addActionListener(new ActionListener() {
@@ -418,7 +447,6 @@ public class MainGUI extends JFrame {
 		jpPhong1.setLayout(null);
 		System.out.println(listPhong);
 
-
 		scrollPane.setBorder(null);
 		scrollPane.setBounds(5, 140, 840, 610);
 		jpPhongHat.add(scrollPane);
@@ -443,15 +471,20 @@ public class MainGUI extends JFrame {
 		btnMonAn = new JButton("Món ăn");
 		btnMonAn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
-					System.out.println(entry.getKey() + " " + entry.getValue());
+//				for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
+//					System.out.println(entry.getKey() + " " + entry.getValue());
+//				}
+				if (mapMonAn.isEmpty()) {
+					btnThemMon.setText("Thêm món");
+				} else {
+					btnThemMon.setText("Cập nhật");
 				}
 				setColor(btnMonAn);
 				jpPhongHat.setVisible(false);
 				jpMonAn.setVisible(true);
-				
+
 				jpMonAn_1.removeAll();
-				List<Object> list=new ArrayList<>();
+				List<Object> list = new ArrayList<>();
 				list.addAll(listCombo);
 				paintComMonAn(list);
 				jpMonAn_1.repaint();
@@ -491,11 +524,13 @@ public class MainGUI extends JFrame {
 		lblTrangThaiPhong.setFont(new Font("Arial", Font.BOLD, 14));
 		lblTrangThaiPhong.setBounds(0, 0, 160, 25);
 		jpTrangThaiPhong.add(lblTrangThaiPhong);
+		jpTrangThaiPhong.setVisible(false);
 
 		lblPhong = new JLabel("Phòng 101");
 		lblPhong.setFont(new Font("Arial", Font.BOLD, 20));
 		lblPhong.setBounds(224, 10, 120, 30);
 		panel_15.add(lblPhong);
+		lblPhong.setVisible(false);
 
 		lblTongGio = new JLabel("00:00:00");
 		lblTongGio.setFont(new Font("Arial", Font.BOLD, 20));
@@ -685,7 +720,7 @@ public class MainGUI extends JFrame {
 		btnTraPhong.setForeground(Color.WHITE);
 		btnTraPhong.setFont(new Font("Arial", Font.BOLD, 14));
 		btnTraPhong.setBackground(new Color(33, 156, 144));
-		btnTraPhong.setBounds(456, 637, 170, 30);
+		btnTraPhong.setBounds(456, 677, 170, 30);
 		panel.add(btnTraPhong);
 
 		btnGopPhong = new JButton("GỘP PHÒNG");
@@ -724,7 +759,7 @@ public class MainGUI extends JFrame {
 		btnHuyDatPhong.setForeground(Color.WHITE);
 		btnHuyDatPhong.setFont(new Font("Arial", Font.BOLD, 14));
 		btnHuyDatPhong.setBackground(new Color(33, 156, 144));
-		btnHuyDatPhong.setBounds(456, 677, 170, 30);
+		btnHuyDatPhong.setBounds(456, 637, 170, 30);
 		panel.add(btnHuyDatPhong);
 
 		String ten = null;
@@ -780,7 +815,7 @@ public class MainGUI extends JFrame {
 		btnSearchMA.setBounds(683, 12, 85, 25);
 		jpMonAn.add(btnSearchMA);
 // Xử lý món ăn --------------------------------------------------------------------------------------
-		
+
 		btnComBo = new JButton("COMBO");
 		btnComBo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -856,7 +891,7 @@ public class MainGUI extends JFrame {
 		btnTraiCay.setFont(new Font("Arial", Font.BOLD, 14));
 		btnTraiCay.setBounds(641, 57, 160, 40);
 		jpMonAn.add(btnTraiCay);
-		
+
 		jpMonAn_1 = new JPanel();
 		jpMonAn_1.setBackground(new Color(255, 255, 255));
 
@@ -866,25 +901,84 @@ public class MainGUI extends JFrame {
 		scrollPane1.setBorder(null);
 		jpMonAn.add(scrollPane1);
 		jpMonAn_1.setLayout(null);
-		
+
 		btnThemMon = new JButton("Thêm món");
 		btnThemMon.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				model.setRowCount(0);
-				System.out.println("Thêm món");
+				//Thêm vào model để hiển thị
 				for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
 					Object key = entry.getKey();
 					Integer value = entry.getValue();
 					System.out.println(key + " " + value);
-					if(key instanceof Combo) {
+					if (key instanceof Combo) {
 						Combo combo = (Combo) key;
-						model.addRow(new Object[] { combo.getComboID(), combo.getTenCombo(), value, combo.getGiaTien(), combo.getGiaTien()*value });
+						model.addRow(new Object[] { combo.getComboID(), combo.getTenCombo(), value,
+								combo.getGiaTien(), combo.getGiaTien() * value });
 					}
 					if (key instanceof MonAn) {
 						MonAn monAn = (MonAn) key;
-						model.addRow(new Object[] { monAn.getMonAnID(), monAn.getTenMonAn(), value+" "+ monAn.getDonViTinh() ,monAn.getDonGia(),
-								monAn.getDonGia() * value });
+						model.addRow(new Object[] { monAn.getMonAnID(), monAn.getTenMonAn(),
+								value + " " + monAn.getDonViTinh(), monAn.getDonGia(), monAn.getDonGia() * value });
 					}
+				}
+				if(btnThemMon.getText().equals("Cập nhật")) {
+					//Thêm vào database
+					String maPhong = lblKQMaPhong.getText();
+					requestHoaDon.requestGetHoaDonByPhongIDAndTinhTrang(maPhong, false);
+					List<HoaDon> hd = responseHoaDon.getReponseGetHoaDonByPhongIDAndTinhTrang();
+					HoaDon hd1 = hd.get(0);
+					requestChiTietDatCombo.requestGetByPhieuDatMonID(hd1.getPhieuDatMon().getPhieuDatMonID());
+					List<ChiTietDatCombo> ctCombo = responseChiTietDatCombo.getReponseGetByPhieuDatMonID();
+					requestChiTietDatMon.requestGetByPhieuDatMonID(hd1.getPhieuDatMon().getPhieuDatMonID());
+					List<ChiTietDatMon> ctMon = responseChiTietDatMon.getReponseGetByPhieuDatMonID();
+					int tmp = 0;
+					for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
+						if (entry.getKey() instanceof Combo) {
+							Combo combo = (Combo) entry.getKey();
+							ChiTietDatCombo ct = new ChiTietDatCombo();
+							ct.setCombo(combo);
+							ct.setSoLuong(entry.getValue());
+							ct.setPhieuDatMon(hd1.getPhieuDatMon());
+							if (ctCombo.size() == 0) {
+								requestChiTietDatCombo.requestAddCombo(ct);
+								responseChiTietDatCombo.getReponseAddCombo();
+							} else {
+								for (ChiTietDatCombo c : ctCombo) {
+									if (c.getCombo().getComboID() == combo.getComboID()) {
+										requestChiTietDatCombo.requestUpdateSoLuong(ct);
+										responseChiTietDatCombo.getReponseUpdateSoLuong();
+									} else {
+										requestChiTietDatCombo.requestAddCombo(ct);
+										responseChiTietDatCombo.getReponseAddCombo();
+									}
+								}
+							}
+						} else if (entry.getKey() instanceof MonAn) {
+							MonAn monAn = (MonAn) entry.getKey();
+							ChiTietDatMon ct = new ChiTietDatMon();
+							ct.setMonAn(monAn);
+							ct.setSoLuong(entry.getValue());
+							ct.setPhieuDatMon(hd1.getPhieuDatMon());
+							if (ctMon.size() == 0) {
+								requestChiTietDatMon.requestAddMonAn(ct);
+								responseChiTietDatMon.getReponseAddMonAn();
+							} else {
+								for (ChiTietDatMon c : ctMon) {
+									if (c.getMonAn().getMonAnID() == monAn.getMonAnID()) {
+										requestChiTietDatMon.requestUpdateSoLuong(ct);
+										responseChiTietDatMon.getReponseUpdateSoLuong();
+									} else {
+										requestChiTietDatMon.requestAddMonAn(ct);
+										responseChiTietDatMon.getReponseAddMonAn();
+									}
+								}
+							}
+						}
+					}
+					
+					
+					
 				}
 				
 			}
@@ -894,13 +988,20 @@ public class MainGUI extends JFrame {
 		btnThemMon.setBackground(new Color(33, 156, 144));
 		btnThemMon.setBounds(210, 677, 170, 30);
 		jpMonAn.add(btnThemMon);
-		
+
 		jpPhongHat.setVisible(true);
 		jpMonAn.setVisible(false);
-		
+
 		setSelectedButton(btnPhongTrong);
 		setColorLoaiPhong(btnPhongTrong);
 		paintComPhong(listPhongTrong);
+
+		btnGopPhong.setEnabled(false);
+		btnDoiPhong.setEnabled(false);
+		btnHuyDatPhong.setEnabled(false);
+		btnNhanPhong.setEnabled(true);
+		btnDatPhong.setEnabled(true);
+		btnTraPhong.setEnabled(false);
 
 	}
 
@@ -915,15 +1016,14 @@ public class MainGUI extends JFrame {
 		btnDoUong.setBackground(new Color(33, 156, 144));
 		btnSnack.setBackground(new Color(33, 156, 144));
 		btnTraiCay.setBackground(new Color(33, 156, 144));
-		
+
 	}
 
 	protected void setSelectedButton(JButton btn) {
 		// TODO Auto-generated method stub
 		setDefaultSelectedButton();
 		btn.setSelected(true);
-		
-		
+
 	}
 
 	private void setDefaultSelectedButton() {
@@ -943,7 +1043,7 @@ public class MainGUI extends JFrame {
 		btnTamNgung.setSelected(false);
 		btnTraPhong.setSelected(false);
 		btnUser.setSelected(false);
-		
+
 	}
 
 	protected void setColorLoaiPhong(JButton btn) {
@@ -981,30 +1081,35 @@ public class MainGUI extends JFrame {
 			int x = 10;
 			int y = 10;
 			for (Phong p : listPhong) {
-				
+
 				ComPhong comPhong = new ComPhong(p);
-				if(p.getTinhTrang()==1) {
+				if (p.getTinhTrang() == 1) {
 					requestPhieuDatPhong.requestGetPDPByPhongIDAndTinhTrang(p.getPhongID(), 0);
-					listPDP=responsePhieuDatPhong.getResponseGetPDPByPhongIDAndTinhTrang();
-					if(listPDP.size()>0) {
+					listPDP = responsePhieuDatPhong.getResponseGetPDPByPhongIDAndTinhTrang();
+					if (listPDP.size() > 0) {
 						pdp = listPDP.get(0);
 						comPhong.setPhongDatTruoc(pdp);
 					}
 				} else if (p.getTinhTrang() == 2) {
 					System.out.println("Phong dang su dung");
 					requestHoaDon.requestGetHoaDonByPhongIDAndTinhTrang(p.getPhongID(), false);
-					listHD = responseHoaDon.getReponseGetHoaDonByPhongIDAndTinhTrang();
-					
-					System.out.println(listHD.size());
+					List<HoaDon> listHD = responseHoaDon.getReponseGetHoaDonByPhongIDAndTinhTrang();
+
+					// System.out.println(listHD.size());
 					if (listHD.size() > 0) {
-						hd = listHD.get(0);
+						try {
+							hd = listHD.get(0);
+						} catch (Exception e) {
+							// TODO: handle exception
+							e.printStackTrace();
+						}
 						comPhong.setPhongDangSuDung(hd);
-						
+						// System.out.println(hd.getPhieuDatMon().getPhieuDatMonID());
+
 					}
 				}
-				
-				
 				comPhong.addMouseListener(new MouseAdapter() {
+
 					@Override
 					public void mouseClicked(MouseEvent e) {
 						lblKQMaPhong.setText(p.getPhongID());
@@ -1013,6 +1118,9 @@ public class MainGUI extends JFrame {
 						lblKetQuaSoNguoi.setText(String.valueOf(p.getSoNguoi()));
 						lblKQGiaTien.setText(String.valueOf(p.getGiaTien()));
 						lblPhong.setText(p.getTenPhong());
+						lblPhong.setVisible(true);
+						jpTrangThaiPhong.setVisible(true);
+						// Phòng trống---------------------------------
 						if (p.getTinhTrang() == 0) {
 							lblKQGioVao.setText("");
 							jpTrangThaiPhong.setBackground(new Color(50, 240, 19));
@@ -1020,49 +1128,79 @@ public class MainGUI extends JFrame {
 							lblTongGio.setText("00:00:00");
 							resetKhachHang();
 							resetMonAn();
-							
+
 						}
+						// Phòng đặt trước---------------------------------
 						if (p.getTinhTrang() == 1) {
 //							lblKQGioVao.setText(p.getGioVao().toString());
+							requestPhieuDatPhong.requestGetPDPByPhongIDAndTinhTrang(p.getPhongID(), 0);
+							listPDP = responsePhieuDatPhong.getResponseGetPDPByPhongIDAndTinhTrang();
+							if (listPDP.size() > 0) {
+								pdp1 = listPDP.get(0);
+								comPhong.setPhongDatTruoc(pdp);
+							}
 							jpTrangThaiPhong.setBackground(new Color(255, 199, 0));
 							lblTrangThaiPhong.setText("Phòng đặt trước");
-							lblKQGioVao.setText(pdp.getGioVao().toString());
+							lblKQGioVao.setText(pdp1.getGioVao().toString());
 							setKhachHang(pdp.getKhachHang());
-							lblTongGio.setText(FormatDateTime.tinhKhoanThoiGian(pdp.getGioVao(), LocalDateTime.now()));
+							lblTongGio.setText(FormatDateTime.tinhKhoanThoiGian(pdp1.getGioVao(), LocalDateTime.now()));
+							lblKQGioVao.setText(FormatDateTime.formatLayGio(pdp1.getGioVao()));
 							resetMonAn();
 //							System.out.println(listPDP);
 						}
+						// Phòng đang sử dụng---------------------------------
 						if (p.getTinhTrang() == 2) {
-//							lblKQGioVao.setText(p.getGioVao().toString());
+							mapMonAn.clear();
+							model.setRowCount(0);
 							jpTrangThaiPhong.setBackground(new Color(235, 100, 64));
 							lblTrangThaiPhong.setText("Phòng đang sử dụng");
-							setKhachHang(hd.getKhachHang());
-							setMonAn(mapMonAn);
 							
+//							setMonAn(mapMonAn);
 							
-							requestChiTietDatCombo.requestGetByPhieuDatMonID(hd.getPhieuDatMon().getPhieuDatMonID());
+							requestHoaDon.requestGetHoaDonByPhongIDAndTinhTrang(p.getPhongID(), false);
+							List<HoaDon> listHD = responseHoaDon.getReponseGetHoaDonByPhongIDAndTinhTrang();
+							hd1 = listHD.get(0);
+							setKhachHang(hd1.getKhachHang());
+//								model.setRowCount(0);
+							lblKQGioVao.setText(FormatDateTime.formatLayGio(hd1.getGioVao()));
+							lblTongGio.setText(FormatDateTime.tinhKhoanThoiGian(hd1.getGioVao(), LocalDateTime.now()));
+
+							requestChiTietDatCombo.requestGetByPhieuDatMonID(hd1.getPhieuDatMon().getPhieuDatMonID());
 							List<ChiTietDatCombo> listCTDC = responseChiTietDatCombo.getReponseGetByPhieuDatMonID();
-							requestChiTietDatMon.requestGetByPhieuDatMonID(hd.getPhieuDatMon().getPhieuDatMonID());
+
+							requestChiTietDatMon.requestGetByPhieuDatMonID(hd1.getPhieuDatMon().getPhieuDatMonID());
 							List<ChiTietDatMon> listCTDM = responseChiTietDatMon.getReponseGetByPhieuDatMonID();
-							
-							//Map<Object, Integer> map = new LinkedHashMap<>();
+
 							for (ChiTietDatCombo ctdc : listCTDC) {
-								mapMonAn.put(ctdc.getCombo(), ctdc.getSoLuong());
+								if (mapMonAn.containsKey(ctdc.getCombo())) {
+									mapMonAn.replace(ctdc.getCombo(), ctdc.getSoLuong());
+								} else {
+									mapMonAn.put(ctdc.getCombo(), ctdc.getSoLuong());
+								}
+//									mapMonAn.put(ctdc.getCombo(), ctdc.getSoLuong());
 							}
 							for (ChiTietDatMon ctdm : listCTDM) {
-								mapMonAn.put(ctdm.getMonAn(), ctdm.getSoLuong());
+								if (mapMonAn.containsKey(ctdm.getMonAn())) {
+									mapMonAn.replace(ctdm.getMonAn(), ctdm.getSoLuong());
+								} else {
+									mapMonAn.put(ctdm.getMonAn(), ctdm.getSoLuong());
+
+								}
+//									mapMonAn.put(ctdm.getMonAn(), ctdm.getSoLuong());
+
 							}
-							System.out.println("Su kien click");
+
+							setMonAn(mapMonAn);
+							mapMonAnFirst.putAll(mapMonAn);
+							System.out.println("Map click");
 							for (Map.Entry<Object, Integer> entry : mapMonAn.entrySet()) {
 								System.out.println(entry.getKey() + " " + entry.getValue());
 							}
-							setMonAn(mapMonAn);
-							
-							
 						}
+						// Phòng tạm ngưng---------------------------------
 						if (p.getTinhTrang() == 3) {
 							lblKQGioVao.setText("");
-							jpTrangThaiPhong.setBackground(new Color(217, 217, 217));
+							jpTrangThaiPhong.setBackground(new Color(0, 0, 0));
 							lblTrangThaiPhong.setText("Phòng tạm ngưng");
 							lblTongGio.setText("00:00:00");
 							resetKhachHang();
@@ -1081,6 +1219,7 @@ public class MainGUI extends JFrame {
 
 		}
 	}
+
 	public void paintComMonAn(List<Object> listObject) {
 		if (listObject != null) {
 			int x = 10;
@@ -1120,19 +1259,22 @@ public class MainGUI extends JFrame {
 				entry.setValue(entry.getValue() + 1);
 			}
 		}
-	
+
 	}
+
 	public void resetKhachHang() {
 		txtHoTen.setText("");
 		txtSDT.setText("");
 		txtEmail.setText("");
 		groupGioiTinh.clearSelection();
 		date.setDate(null);
-		
+
 	}
+
 	public void resetMonAn() {
 		model.setRowCount(0);
 	}
+
 	public void resetPhong() {
 		lblKetQuaSoNguoi.setText("");
 		lblKQGiaTien.setText("");
@@ -1140,13 +1282,15 @@ public class MainGUI extends JFrame {
 		lblKQLoaiPhong.setText("");
 		lblKQMaPhong.setText("");
 		lblKQTenPhong.setText("");
-		
+
 	}
+
 	public void reset() {
 		resetKhachHang();
 		resetPhong();
 		resetMonAn();
 	}
+
 	public void setKhachHang(KhachHang kh) {
 		txtHoTen.setText(kh.getHoTen());
 		txtSDT.setText(kh.getSoDienThoai());
@@ -1158,7 +1302,7 @@ public class MainGUI extends JFrame {
 		}
 		Date date1 = java.sql.Date.valueOf(kh.getNgaySinh());
 		date.setDate(date1);
-		
+
 	}
 
 	public void setMonAn(Map<Object, Integer> map) {
@@ -1176,7 +1320,7 @@ public class MainGUI extends JFrame {
 						monAn.getDonGia(), monAn.getDonGia() * value });
 			}
 		}
-		
+
 	}
 
 }

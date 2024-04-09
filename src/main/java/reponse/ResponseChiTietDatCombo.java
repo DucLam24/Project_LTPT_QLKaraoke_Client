@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.List;
 
 import entity.ChiTietDatCombo;
+import service.InputDIS;
 import service.InputOIS;
 
 public class ResponseChiTietDatCombo {
@@ -16,7 +17,7 @@ public class ResponseChiTietDatCombo {
 	public ResponseChiTietDatCombo(Socket socket) {
 		this.socket = socket;
 		ois = InputOIS.getInstance().getOis();
-
+		dis = InputDIS.getInstance().getDis();
 	}
 	
 	public List<ChiTietDatCombo> getReponseGetByPhieuDatMonID() {
@@ -27,6 +28,24 @@ public class ResponseChiTietDatCombo {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public boolean getReponseUpdateSoLuong() {
+		try {
+			return dis.readBoolean();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public boolean getReponseAddCombo() {
+		try {
+			return dis.readBoolean();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 }
